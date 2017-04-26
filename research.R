@@ -15,10 +15,10 @@ library("maps")
 library("ggmap")
 
 # Secret Information
-consumer_key <- "Secret"
-consumer_secret <- "Secret"
-access_token <- "Secret"
-access_secret <- "Secret"
+consumer_key <- "SUPER SECRET"
+consumer_secret <- "SUPER SECRET"
+access_token <- "SUPER SECRET"
+access_secret <- "SUPER SECRET"
 setup_twitter_oauth(consumer_key,consumer_secret,access_token,access_secret)
 
 # Create a dataframe of 5000 tweets with Cats, cats, felines, or #cats
@@ -112,13 +112,12 @@ states = gsub("Wisconsin", "WI", states)
 states = gsub("Wyoming", "WY", states)
 na.omit(states)
 states <- na.omit(states)
-
 statesDF= rbindlist(lapply(states,as.data.frame))
 
 #https://www.dol.gov/whd/programs/dbra/regions.htm#regioninfo
 
 #WEST = 153
-#Alaska, Arizona, California, Nevada, Hawaii, Oregon, Idaho, Washington
+#Arizona, California, Nevada, Hawaii, Oregon, Idaho, Washington
 AZ <- grepl("AZ", states) 
 CA <- grepl("CA", states) 
 ID <- grepl("ID", states) 
@@ -141,13 +140,13 @@ OH <- grepl("OH", states)
 WI <- grepl("WI", states) 
 sum(IL,IN,IA,KS,MI,MN,MO,NE,OH,WI)
 
-#SOUTHWEST = 108
+#SOUTHWEST = 98
 #Arkansas, Colorado, Louisiana, Montana, New Mexico, North Dakota, 
 #Oklahoma, South Dakota, Texas, Utah and Wyoming
 AR <- grepl("AR", states) 
 CO <- grepl("CO", states) 
 LA <- grepl("LA", states) 
-MN <- grepl("MN", states) 
+MT <- grepl("MT", states) 
 NM <- grepl("NM", states) 
 ND <- grepl("ND", states) 
 OK <- grepl("OK", states) 
@@ -155,7 +154,7 @@ SD <- grepl("SD", states)
 TX <- grepl("TX", states) 
 UT <- grepl("UT", states) 
 WY <- grepl("WY", states) 
-sum(AR,CO,LA,MN,NM,ND,OK,SD,TX,UT,WY)
+sum(AR,CO,LA,MT,NM,ND,OK,SD,TX,UT,WY)
 
 #SOUTHEAST = 124
 #Alabama, Florida, Georgia, Kentucky, Mississippi, North Carolina, South Carolina and Tennessee.
@@ -167,7 +166,7 @@ MS <- grepl("MS", states)
 NC <- grepl("NC", states) 
 SC <- grepl("SC", states) 
 TN <- grepl("TN", states) 
-sum(AL,FL,GA,KY,MS,NC,SC,TN)
+
 
 #NORTHEAST = 136
 #Connecticut, Delaware, Maine, Maryland, Massachusetts, New Hampshire, New Jersey, New York, 
@@ -186,9 +185,10 @@ VT <- grepl("vT", states)
 VA <- grepl("VA", states) 
 WV <- grepl("WV", states) 
 sum(CT,DE,ME,MD,MA,NH,NJ,NY,PA,RI,VT,VA,WV)
-#total = 666
+#total = 656
 
-##################################################################################################
+########## SECOND DATAFRAME ############# 
+#########################################
 
 s2 = strsplit(catTweetUsers2Location, ",")
 # returns the 2nd element of a vector
@@ -283,13 +283,13 @@ OH2 <- grepl("OH", states2)
 WI2 <- grepl("WI", states2) 
 sum(IL2,IN2,IA2,KS2,MI2,MN2,MO2,NE2,OH2,WI2)
 
-#SOUTHWEST = 107
+#SOUTHWEST = 99
 #Arkansas, Colorado, Louisiana, Montana, New Mexico, North Dakota, 
 #Oklahoma, South Dakota, Texas, Utah and Wyoming
 AR2 <- grepl("AR", states2) 
 CO2 <- grepl("CO", states2) 
 LA2 <- grepl("LA", states2) 
-MN2 <- grepl("MN", states2) 
+MT2 <- grepl("MT", states2) 
 NM2 <- grepl("NM", states2) 
 ND2 <- grepl("ND", states2) 
 OK2 <- grepl("OK", states2) 
@@ -297,7 +297,7 @@ SD2 <- grepl("SD", states2)
 TX2 <- grepl("TX", states2) 
 UT2 <- grepl("UT", states2) 
 WY2 <- grepl("WY", states2) 
-sum(AR2,CO2,LA2,MN2,NM2,ND2,OK2,SD2,TX2,UT2,WY2)
+sum(AR2,CO2,LA2,MT2,NM2,ND2,OK2,SD2,TX2,UT2,WY2)
 
 #SOUTHEAST = 108
 #Alabama, Florida, Georgia, Kentucky, Mississippi, North Carolina, South Carolina and Tennessee.
@@ -328,48 +328,113 @@ VT2 <- grepl("vT", states2)
 VA2 <- grepl("VA", states2) 
 WV2 <- grepl("WV", states2) 
 sum(CT2,DE2,ME2,MD2,MA2,NH2,NJ2,NY2,PA2,RI2,VT2,VA2,WV2)
-#total 575
+#total 567
 
+########## TABLES AND BARPLOTS ########## 
+#########################################
 
-stateProp <- c(153, 145, 108, 124, 136)
-state2Prop <- c(155, 99, 107, 108, 106)
+# Declaration of Region Colors: West, Midwest, Southwest, Southeast, Northeast
+regionColors <- c("#f76f6a","#f59846", "#C7E363", "#f9dc6d", "#58b2c3")
 
-
-stateTable <- matrix(c(153, 145, 108, 124, 136), ncol=5, byrow=TRUE)
+# Table 1 Set up
+stateTable <- matrix(c(153, 145, 98, 124, 136), ncol=5, byrow=TRUE)
 colnames(stateTable) <- c("West", "Midwest", "Southwest", "Southeast", "Northeast")
-rownames(stateTable) <- c("Count")
+rownames(stateTable) <- c("Proportion")
 stateTable <- as.table(stateTable)
-stateTableProp <- prop.table(stateTable) *100
+stateTableProp <- prop.table(stateTable)*100
 t.mat <- t(stateTableProp)
-barplot(height = t.mat, beside = T, main="Proportion of Cat-related Tweets", xlab="Regions", col=c("firebrick3","darkorchid", "darkorange2", "gold1", "deepskyblue3"),
+
+# Prototype Barplot
+barplot(height = t.mat, beside = T, main="Proportion of Cat-related Tweets", xlab="Regions", ylab = "Percentages", col=regionColors,
         names.arg=c("West","Midwest", "Southwest", "Southeast", "Northeast"), ylim = c(0,30), space = c(0.5,0.5,0.5,0.5,0.5))
 
-state2Table <- matrix(c(155, 99, 107, 108, 106), ncol=5, byrow=TRUE)
+tableProps <- read.csv("tableProps.csv", header=TRUE)
+tableProps$Region <- factor(tableProps$Region, as.character(tableProps$Region))
+
+# Barplot 1
+ggplot(data=tableProps, aes(x=Region, y=Proportion, fill=Region)) + 
+  labs(title="Proportion of Cat-Related Tweets by Region" ,subtitle = ("February 21, 2017")) +
+  geom_bar(stat="identity", position="dodge", color="#999999") + scale_fill_manual(values=regionColors) +
+  scale_y_continuous(limits=c(0,30), breaks=seq(0,30,5.0)) + theme_minimal() + theme(text = element_text(size=16)) +
+  geom_text(aes(label=Proportion), vjust=1.5, size = 5) + theme(plot.title = element_text(size=24, face="bold", hjust=0.5),
+                                                                plot.subtitle=element_text(hjust=0.5, face="italic"),
+                                                                axis.title.x = element_text(size=14),
+                                                                axis.title.y = element_text(size=14))
+
+# Table 2 Set up
+state2Table <- matrix(c(155, 99, 107, 99, 106), ncol=5, byrow=TRUE)
 colnames(state2Table) <- c("West", "Midwest", "Southwest", "Southeast", "Northeast")
-rownames(state2Table) <- c("Count")
+rownames(state2Table) <- c("Proportion")
 state2Table <- as.table(state2Table)
-stateTable2Prop <- prop.table(state2Table) * 100
+stateTable2Prop <- prop.table(state2Table)*100
 t.mat2 <- t(stateTable2Prop)
-barplot(height = t.mat2, beside = T, main="Proportion of Cat-related Tweets", xlab="Regions", col=c("firebrick3","darkorchid", "darkorange2", "gold1", "deepskyblue3"),
+
+# Prototype Barplot 2
+barplot(height = t.mat2, beside = T, main="Proportion of Cat-related Tweets", xlab="Regions", ylab="Percentages", col=regionColors,
         names.arg=c("West","Midwest", "Southwest", "Southeast", "Northeast"), ylim = c(0,30), space = c(0.5,0.5,0.5,0.5,0.5))
 
-#####Generate a Map for 48 states based on tweets previously retrieved#####
+# Barplot 2
+ggplot(data=tableProps, aes(x=Region, y=Proportion2, fill=Region)) + 
+  labs(title="Proportion of Cat-Related Tweets by Region" ,subtitle = ("February 23, 2017")) +
+  geom_bar(stat="identity", position="dodge", color="#999999") + scale_fill_manual(values=regionColors) +
+  scale_y_continuous(limits=c(0,30), breaks=seq(0,30,5.0)) + theme_minimal() + theme(text = element_text(size=16)) +
+  geom_text(aes(label=Proportion2), vjust=1.5, size = 5) + theme(plot.title = element_text(size=16, face="bold", hjust=0.5 ),
+                                                                 plot.subtitle=element_text(hjust=0.5, face="italic"),
+                                                                 axis.title.x = element_text(size=14),
+                                                                 axis.title.y = element_text(size=14))
 
+# Comparison of Proportions
+# Import CSV file with proportions
+pTableCSV <- read.csv("proportionTable.csv", header=TRUE)
+
+# Keep the levels in order of appearance in the data frame.
+pTableCSV$Region <- factor(pTableCSV$Region, as.character(pTableCSV$Region))
+
+ggplot(pTableCSV, aes(Region, Proportion, fill = Date)) + ggtitle("Proportion of Cat-Related Tweets by Day") + 
+  geom_bar(stat="identity", position = "dodge") + scale_y_continuous(limits=c(0,30), breaks=seq(0,30,5.0)) +
+  scale_fill_brewer(palette = "Set2")
+
+########## MAPPING TWEETS TO ############
+########## A REGION/STATE    ############
+#########################################
+
+# Import state coords
+stateCoords <- read.csv("stateCoords.csv", header=TRUE)
+
+# Generate US Map
+# Retrieve map of the U.S. (Alaska and Hawaii excluded)
 map.data <- map_data("state")
-points <- data.frame(x = as.numeric(statesDF$place_lon), y = as.numeric(statesDF$place_lat))
-points <- points[points$y > 25, ]
-
-ggplot(map.data) + geom_map(aes(map_id = region), map = map.data, fill = "white", color = "grey20", size = 0.25) +
+# Create the map
+m =  ggplot(map.data) + geom_map(aes(map_id = region), map = map.data, fill = "white", color = "grey20", size = 0.25) +
   expand_limits(x = map.data$long, y = map.data$lat) + 
   theme(axis.line = element_blank(), axis.text = element_blank(), axis.ticks = element_blank(),
         axis.title = element_blank(), panel.background = element_blank(), panel.border = element_blank(),
         panel.grid.major = element_blank(), plot.background = element_blank(),
-        plot.margin = unit(0 * c(-1.5, -1.5, -1.5, -1.5), "lines"))
+        plot.margin = unit(0 * c(-1.5, -1.5, -1.5, -1.5), "lines")) 
+# plot the map
 plot(m)
 
+# generate points based on latitude and longitude
+# (points are near IL and CA)
+long1 = rnorm(5, mean = -90)
+long2 = rnorm(20, mean = -120)
+lat = rnorm(40, mean = 40)
+
+points = data.frame(x = c(long1, long2), y = lat)
+
+# color the first 20 points (IL) blue and the 2nd 20 (CA) red
+col = c(rep("blue", 20), rep("red", 20))
+
+# add the points to the map
+m2 = m + geom_point(data = points,  aes(x = x, y = y), size = 1, alpha = 1, color = col)
+
+# plot the map with the points
+plot(m2)
+
+##### REFERENCES#######################
 #######################################
 
-statesCSV <- read.csv("states.DF.csv", header=TRUE, stringAsFactors = FALSE)
-
-
-
+# https://kohske.wordpress.com/2010/12/29/faq-how-to-order-the-factor-variables-in-ggplot2/
+# GGPLOT, reordering the Regions so they exist in order that they do in the DF.
+# http://yatani.jp/teaching/doku.php?id=hcistats:chisquare
+# Chi-squared test example.
