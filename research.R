@@ -336,6 +336,7 @@ sum(CT2,DE2,ME2,MD2,MA2,NH2,NJ2,NY2,PA2,RI2,VT2,VA2,WV2)
 # Declaration of Region Colors: West, Midwest, Southwest, Southeast, Northeast
 regionColors <- c("#f76f6a","#f59846", "#C7E363", "#f9dc6d", "#58b2c3")
 
+
 # Table 1 Set up
 stateTable <- matrix(c(153, 145, 98, 124, 136), ncol=5, byrow=TRUE)
 colnames(stateTable) <- c("West", "Midwest", "Southwest", "Southeast", "Northeast")
@@ -353,7 +354,7 @@ tableProps$Region <- factor(tableProps$Region, as.character(tableProps$Region))
 
 # Barplot 1
 ggplot(data=tableProps, aes(x=Region, y=Proportion, fill=Region)) + 
-  labs(title="Proportion of Cat-Related Tweets by Region" ,subtitle = ("February 21, 2017")) +
+  labs(title="Proportion of Cat-Related Tweets by Region" ,subtitle = ("February 21, 2017")) + ylab("Percentages") +
   geom_bar(stat="identity", position="dodge", color="#999999") + scale_fill_manual(values=regionColors) +
   scale_y_continuous(limits=c(0,30), breaks=seq(0,30,5.0)) + theme_minimal() + theme(text = element_text(size=16)) +
   geom_text(aes(label=Proportion), vjust=1.5, size = 5) + theme(plot.title = element_text(size=24, face="bold", hjust=0.5),
@@ -375,10 +376,10 @@ barplot(height = t.mat2, beside = T, main="Proportion of Cat-related Tweets", xl
 
 # Barplot 2
 ggplot(data=tableProps, aes(x=Region, y=Proportion2, fill=Region)) + 
-  labs(title="Proportion of Cat-Related Tweets by Region" ,subtitle = ("February 23, 2017")) +
+  labs(title="Proportion of Cat-Related Tweets by Region" ,subtitle = ("February 23, 2017")) + ylab("Percentages") +
   geom_bar(stat="identity", position="dodge", color="#999999") + scale_fill_manual(values=regionColors) +
   scale_y_continuous(limits=c(0,30), breaks=seq(0,30,5.0)) + theme_minimal() + theme(text = element_text(size=16)) +
-  geom_text(aes(label=Proportion2), vjust=1.5, size = 5) + theme(plot.title = element_text(size=16, face="bold", hjust=0.5 ),
+  geom_text(aes(label=Proportion2), vjust=1.5, size = 5) + theme(plot.title = element_text(size=24, face="bold", hjust=0.5 ),
                                                                  plot.subtitle=element_text(hjust=0.5, face="italic"),
                                                                  axis.title.x = element_text(size=14),
                                                                  axis.title.y = element_text(size=14))
@@ -390,9 +391,13 @@ pTableCSV <- read.csv("proportionTable.csv", header=TRUE)
 # Keep the levels in order of appearance in the data frame.
 pTableCSV$Region <- factor(pTableCSV$Region, as.character(pTableCSV$Region))
 
-ggplot(pTableCSV, aes(Region, Proportion, fill = Date)) + ggtitle("Proportion of Cat-Related Tweets by Day") + 
-  geom_bar(stat="identity", position = "dodge") + scale_y_continuous(limits=c(0,30), breaks=seq(0,30,5.0)) +
-  scale_fill_brewer(palette = "Set2")
+ggplot(pTableCSV, aes(Region, Proportion, fill = Date)) + ggtitle("Proportion of Cat-Related Tweets by Day") + ylab("Percentages") +
+  geom_bar(stat="identity", position = "dodge", color="#cecaca") + scale_y_continuous(limits=c(0,30), breaks=seq(0,30,5.0)) +
+  scale_fill_manual(values=c("#FFF3E5", "#E8B0AF")) + theme_minimal() + theme(text=element_text(size=16)) + theme(plot.title=element_text(size=24, face="bold", hjust=0.5),
+                                                                                                                  axis.title.x=element_text(size=14),
+                                                                                                                  axis.title.y=element_text(size=14))
+
+cTest <- read.csv("chi-sq-table.csv", header = TRUE, row.names = 1)
 
 ########## MAPPING TWEETS TO ############
 ########## A REGION/STATE    ############
@@ -414,22 +419,36 @@ m =  ggplot(map.data) + geom_map(aes(map_id = region), map = map.data, fill = "w
 # plot the map
 plot(m)
 
-# generate points based on latitude and longitude
-# (points are near IL and CA)
-long1 = rnorm(5, mean = -90)
-long2 = rnorm(20, mean = -120)
-lat = rnorm(40, mean = 40)
+x = NULL
+y = NULL
+col = NULL
+for (i in 1:nrow(stateCoords)) {
+  r = stateCoords[i,]
+  x1 = rep(r$Longitude, r$catTweets2)
+  y1 = rep(r$Latitude, r$catTweets2)
+  x = c(x, x1)
+  y = c(y, y1)
+  
+  stateColor = regionColors[r$RegionNum]
+  
+  nextCol = rep(stateColor, r$catTweets2)
+  
+  col = c(col, nextCol)
+}
 
-points = data.frame(x = c(long1, long2), y = lat)
 
-# color the first 20 points (IL) blue and the 2nd 20 (CA) red
-col = c(rep("blue", 20), rep("red", 20))
+x = x + rnorm(length(x), sd = .27)
+y = y + rnorm(length(y), sd = .27)
+
+points = data.frame(x = x, y = y)
+
 
 # add the points to the map
-m2 = m + geom_point(data = points,  aes(x = x, y = y), size = 1, alpha = 1, color = col)
-
+m2 = m + geom_point(data = points,  aes(x = x, y = y), size = 3, alpha = 0.3, color = col) 
 # plot the map with the points
 plot(m2)
+
+
 
 ##### REFERENCES#######################
 #######################################
@@ -437,4 +456,6 @@ plot(m2)
 # https://kohske.wordpress.com/2010/12/29/faq-how-to-order-the-factor-variables-in-ggplot2/
 # GGPLOT, reordering the Regions so they exist in order that they do in the DF.
 # http://yatani.jp/teaching/doku.php?id=hcistats:chisquare
-# Chi-squared test example.
+# Chi-squared test 
+
+dput(stateCoords)
